@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ad6dceee50581223a087fe6db320627",
+    "content-hash": "9ec8459cb65edb9ed965f634822d27cd",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -455,6 +455,59 @@
                 }
             ],
             "time": "2025-02-21T08:52:11+00:00"
+        },
+        {
+            "name": "deividfortuna/fipe",
+            "version": "2.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/deividfortuna/fipe.git",
+                "reference": "a21e2e50dc2002a539bd42ca82da02f9e01595bd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/deividfortuna/fipe/zipball/a21e2e50dc2002a539bd42ca82da02f9e01595bd",
+                "reference": "a21e2e50dc2002a539bd42ca82da02f9e01595bd",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DeividFortuna\\Fipe\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Deivid Fortuna",
+                    "email": "deividfortuna@gmail.com"
+                },
+                {
+                    "name": "Alison Monteiro",
+                    "email": "hi@alisonmonteiro.com.br"
+                },
+                {
+                    "name": "Felipe Torretto",
+                    "email": "toreti@gmail.com"
+                }
+            ],
+            "description": "Tabela Fipe Lib",
+            "support": {
+                "issues": "https://github.com/deividfortuna/fipe/issues",
+                "source": "https://github.com/deividfortuna/fipe/tree/v2.5.0"
+            },
+            "time": "2024-06-03T21:29:10+00:00"
         },
         {
             "name": "dflydev/dot-access-data",

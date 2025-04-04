@@ -23,4 +23,9 @@ class Car extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function kilometers()
+    {
+        return $this->hasMany(CarKilometer::class);
+    }
 }

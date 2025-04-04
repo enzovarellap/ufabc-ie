@@ -8,20 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('cars', function (Blueprint $table) {
+        Schema::create('car_kilometers', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('user_id');
-            $table->string('brand');
-            $table->string('model');
-            $table->string('year');
-            $table->bigInteger('value');
-            $table->string('fipe_code');
+            $table->foreignId('car_id');
+            $table->float('kilometers');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('cars');
+        Schema::dropIfExists('car_kilometers');
     }
 };

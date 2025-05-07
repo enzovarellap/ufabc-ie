@@ -19,6 +19,7 @@ class Car extends Model
         'year',
         'value',
         'fipe_code',
+        'plate'
     ];
 
     public function user(): BelongsTo

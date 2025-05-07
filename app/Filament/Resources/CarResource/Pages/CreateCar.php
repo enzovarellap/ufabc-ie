@@ -49,7 +49,11 @@ class CreateCar extends CreateRecord
                     ->label('Marca')
                     ->searchable()
                     ->options($brandOptions)
-                    ->live(),
+                    ->live()
+                    ->afterStateUpdated(function($set) {
+                        $set('year', null);
+                        $set('model', null);
+                    }),
 
                 Select::make('model')
                     ->label('Modelo')
@@ -69,7 +73,10 @@ class CreateCar extends CreateRecord
 
                         return [];
 
-                    })->live(),
+                    })->live()
+                    ->afterStateUpdated(function($set) {
+                        $set('year', null);
+                    }),
 
                 Select::make('year')
                     ->label('Ano')

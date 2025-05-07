@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Car extends Model
 {
@@ -24,8 +25,13 @@ class Car extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function kilometers()
+    public function kilometers(): HasMany
     {
         return $this->hasMany(CarKilometer::class);
+    }
+
+    public function services(): HasMany
+    {
+        return $this->hasMany(Services::class, 'car_services');
     }
 }

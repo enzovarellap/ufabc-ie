@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Car extends Model
@@ -30,8 +31,9 @@ class Car extends Model
         return $this->hasMany(CarKilometer::class);
     }
 
-    public function services(): HasMany
+    public function services(): BelongsToMany
     {
-        return $this->hasMany(Services::class, 'car_services');
+        return $this->belongsToMany(Services::class, 'car_services', 'car_id', 'service_id')
+            ->withPivot('timesdue', 'is_done');
     }
 }

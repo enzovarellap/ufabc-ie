@@ -11,7 +11,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('car_id')->constrained()->onDelete('cascade');
             $table->foreignId('service_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
+            $table->integer('timesdue');
+            $table->boolean('is_done')->default(false);
         });
     }
 

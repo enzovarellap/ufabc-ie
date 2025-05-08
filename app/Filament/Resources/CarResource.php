@@ -34,78 +34,18 @@ class CarResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $brands = FipeCarros::getMarcas();
-        $brandOptions = [];
-        foreach ($brands as $brand) {
-            $brandOptions[$brand['codigo']] = $brand['nome'];
-        }
+//        $brands = FipeCarros::getMarcas();
+//        $brandOptions = [];
+//        foreach ($brands as $brand) {
+//            $brandOptions[$brand['codigo']] = $brand['nome'];
+//        }
 
         return $form
             ->schema([
-                Select::make('brand')
-                    ->searchable()
-                    ->options($brandOptions)
-                    ->live()
-                    ->afterStateUpdated(function ($set) {
-                        $set('model', null);
-                    }),
+                TextInput::make('brand')->label('Marca')->disabled(),
+                TextInput::make('model')->label('Modelo')->disabled(),
+                TextInput::make('year')->label('Ano')->disabled(),
 
-                Select::make('model')
-                    ->searchable()
-                    ->hidden(fn($get) => is_null($get('brand')))
-                    ->options(function ($get) use (&$brandOptions) {
-                        $brand = $get('brand');
-                        if (!ctype_digit($brand)) {
-                            $brand = array_search($get('brand'), $brandOptions);
-                        }
-
-                        if (!is_null($brand)) {
-                            $models = FipeCarros::getModelos($brand)['modelos'];
-                            $modelOptions = [];
-                            foreach ($models as $model) {
-                                $modelOptions[$model['codigo']] = $model['nome'];
-                            }
-
-                            return $modelOptions;
-                        }
-
-                        return [];
-
-                    })->live()
-                    ->afterStateUpdated(fn($set) => $set('year', null)),
-
-                Select::make('year')
-                    ->searchable()
-                    ->hidden(fn($get) => is_null($get('model')))
-                    ->options(function ($get) use (&$brandOptions) {
-                        $brand = $get('brand');
-                        $model = $get('model');
-
-                        if (!ctype_digit($brand)) {
-                            $brand = array_search($get('brand'), $brandOptions);
-                        }
-                        if (!ctype_digit($model)) {
-                            $models = FipeCarros::getModelos($brand)['modelos'];
-                            $modelOptions = [];
-                            foreach ($models as $model) {
-                                $modelOptions[$model['codigo']] = $model['nome'];
-                            }
-
-                            $model = array_search($get('model'), $modelOptions);
-                        }
-
-                        if (!is_null($model)) {
-                            $years = FipeCarros::getAnos($brand, $model);
-                            $yearOptions = [];
-                            foreach ($years as $year) {
-                                $yearOptions[$year['codigo']] = $year['nome'];
-                            }
-
-                            return $yearOptions;
-                        }
-
-                        return [];
-                    }),
             ]);
     }
 

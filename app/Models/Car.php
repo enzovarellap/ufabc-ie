@@ -32,6 +32,11 @@ class Car extends Model
         return $this->hasMany(CarKilometer::class);
     }
 
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(CarExpenses::class);
+    }
+
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Services::class, 'car_services', 'car_id', 'service_id')

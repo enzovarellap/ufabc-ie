@@ -21,7 +21,6 @@ class EditCar extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        dd($data);
         $car = FipeCarros::getVeiculo($data['brand'], $data['model'], $data['year']);
 
         $record->update([

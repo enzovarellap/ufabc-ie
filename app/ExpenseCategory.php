@@ -13,6 +13,9 @@ enum ExpenseCategory: string
     case CLEANING_AND_CARE = 'cleaning_and_care';
     case ACCESSORIES_AND_CUSTOM = 'accessories_and_custom';
     case FINES_AND_FEES = 'fines_and_fees';
+    case LOANS = 'loans';
+
+    case RENTAL = 'rental';
     case OTHERS = 'others';
 
     /**
@@ -30,6 +33,8 @@ enum ExpenseCategory: string
             self::CLEANING_AND_CARE => 'Limpeza e Conservação',
             self::ACCESSORIES_AND_CUSTOM => 'Acessórios e Personalização',
             self::FINES_AND_FEES => 'Multas e Taxas',
+            self::LOANS => 'Financiamento',
+            self::RENTAL => 'Aluguel',
             self::OTHERS => 'Outras',
         };
     }
@@ -49,6 +54,8 @@ enum ExpenseCategory: string
             self::CLEANING_AND_CARE => 'fuchsia',
             self::ACCESSORIES_AND_CUSTOM => 'violet',
             self::FINES_AND_FEES => 'orange',
+            self::LOANS => 'lime',
+            self::RENTAL => 'indigo',
             self::OTHERS => 'slate',
         };
     }
@@ -68,6 +75,8 @@ enum ExpenseCategory: string
             self::CLEANING_AND_CARE => 'heroicon-s-sparkles',
             self::ACCESSORIES_AND_CUSTOM => 'heroicon-s-cog-6-tooth',
             self::FINES_AND_FEES => 'heroicon-s-exclamation-circle',
+            self::LOANS => 'heroicon-s-banknotes',
+            self::RENTAL => 'heroicon-s-tag',
             self::OTHERS => 'heroicon-s-ellipsis-horizontal',
         };
     }

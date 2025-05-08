@@ -26,7 +26,7 @@ class CarExpensesResource extends Resource
 
     protected static ?string $label = 'Despesa';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-wallet';
 
     public static function form(Form $form): Form
     {
@@ -49,9 +49,11 @@ class CarExpensesResource extends Resource
                     ->label('Valor')
                     ->prefix('R$')
                     ->numeric()
-                    ->extraAttributes(['step' => '0.01']), // Permitir valores decimais
+                    ->extraAttributes(['step' => '0.01']),
 
                 DatePicker::make('expense_date')
+                    ->default(now())
+                    ->native(false)
                     ->label('Data da Despesa'),
             ]);
     }

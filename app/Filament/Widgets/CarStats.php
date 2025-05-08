@@ -18,7 +18,8 @@ class CarStats extends BaseWidget
         }
 
         $carKilometers = $car->kilometers->sum('kilometers');
-        $pendingCount = $car->services()->wherePivot('is_done', false)->count();
+        $pendingCarServices = $car->services()->wherePivot('is_done', false);
+        $pendingCount = $pendingCarServices->count();
 
         if ($pendingCount === 0) {
             $pendingDescription = 'Tudo certo!';
@@ -36,6 +37,9 @@ class CarStats extends BaseWidget
 
         return [
 
+            Stat::make('Valor FIPE do Carro', \Number::currency($car->value, 'BRL', 'pt-BR'))
+                ->icon('fas-money-bill-alt'),
+
             Stat::make('Kilometragem', number_format($carKilometers, 0, ',', '.') . ' kms')
                 ->icon('fas-road')
                 ->extraAttributes([
@@ -49,8 +53,10 @@ class CarStats extends BaseWidget
                 ->descriptionIcon($pendingIcon)
                 ->descriptionColor($pendingColor),
 
-            Stat::make('Valor Total', \Number::currency($car->value, 'BRL', 'pt-BR'))
+            Stat::make('Gasto Médio em Serviços Pendentes', \Number::currency($pendingCarServices->sum('price'), 'BRL', 'pt-BR'))
                 ->icon('fas-money-bill-alt'),
+
+
         ];
     }
 

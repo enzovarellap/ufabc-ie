@@ -53,8 +53,8 @@ class CarStats extends BaseWidget
                 ->descriptionIcon($pendingIcon)
                 ->descriptionColor($pendingColor),
 
-            Stat::make('Gasto Médio em Serviços Pendentes', \Number::currency($pendingCarServices->sum('price'), 'BRL', 'pt-BR'))
-                ->icon('fas-money-bill-alt'),
+            Stat::make('Gasto Previsto', \Number::currency($pendingCarServices->sum('price'), 'BRL', 'pt-BR'))
+                ->icon('fas-wallet'),
 
 
         ];

@@ -12,12 +12,14 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\RawJs;
+use Http;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class CreateCar extends CreateRecord
 {
     use HasServicesByKm;
+
     protected static string $resource = CarResource::class;
 
     protected function getHeaderActions(): array
@@ -29,15 +31,16 @@ class CreateCar extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        $car = FipeCarros::getVeiculo($data['brand'], $data['model'], $data['year']);
+        $car = $this->getApiData("brands/{$data['brand']}/models/{$data['model']}/years/{$data['year']}");
+
 
         $carModel = Car::create([
             'user_id' => auth()->user()->id,
-            'brand' => $car['Marca'],
-            'model' => $car['Modelo'],
-            'year' => $car['AnoModelo'],
-            'value' => str_replace(['R$', '.', ',00'], '', $car['Valor']),
-            'fipe_code' => $car['CodigoFipe'],
+            'brand' => $car['brand'],
+            'model' => $car['model'],
+            'year' => $car['modelYear'],
+            'value' => str_replace(['R$', '.', ',00'], '', $car['price']),
+            'fipe_code' => $car['codeFipe'],
             'plate' => Str::upper($data['plate']),
         ]);
 
@@ -45,100 +48,93 @@ class CreateCar extends CreateRecord
             'kilometers' => $data['kilometers'],
         ]);
 
-        $this->addServicesToCar($carModel->id);
-
         return $carModel;
+    }
+
+    protected function getApiData(string $endpoint): array
+    {
+        return Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'X-Subscription-Token' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiNzQ4NTA5OS00YTllLTQ1NTAtYWQzZS1iM2ExYWE1MjViNGMiLCJlbWFpbCI6ImVuem92cGFzdG9yZUBnbWFpbC5jb20iLCJpYXQiOjE3NDY2Nzg5MjN9.cGGnyGi7tc3zCnmPLYFY9vT31rG7A9Yio0pZf2y4O2Q'
+        ])->baseUrl('https://fipe.parallelum.com.br/api/v2/cars/')
+            ->get($endpoint)
+            ->json();
+    }
+
+    protected function getBrandOptions(): array
+    {
+        $brands = $this->getApiData('brands');
+        return collect($brands)->pluck('name', 'code')->toArray();
+    }
+
+    protected function getModelOptions($brand): array
+    {
+        if (!$brand) return [];
+        $models = $this->getApiData("brands/{$brand}/models");
+        return collect($models)->pluck('name', 'code')->toArray();
+    }
+
+    protected function getYearOptions($brand, $model): array
+    {
+        if (!$model || !$brand) return [];
+        $years = $this->getApiData("brands/{$brand}/models/{$model}/years");
+        return collect($years)->pluck('name', 'code')->toArray();
     }
 
     public function form(Form $form): Form
     {
-        $brands = FipeCarros::getMarcas();
-        $brandOptions = [];
-        foreach ($brands as $brand) {
-            $brandOptions[$brand['codigo']] = $brand['nome'];
-        }
+        return $form->schema([
+            Section::make('Selecione os campos abaixo referentes ao seu carro')
+                ->schema([
+                    Select::make('brand')
+                        ->label('Marca')
+                        ->searchable()
+                        ->options($this->getBrandOptions())
+                        ->live()
+                        ->afterStateUpdated(function ($set) {
+                            $set('year', null);
+                            $set('model', null);
+                        }),
 
-        return $form
-            ->schema([
-                Section::make('Selecione os campos abaixo referentes ao seu carro')
-                    ->schema([
-                        Select::make('brand')
-                            ->label('Marca')
-                            ->searchable()
-                            ->options($brandOptions)
-                            ->live()
-                            ->afterStateUpdated(function ($set) {
-                                $set('year', null);
-                                $set('model', null);
-                            })->columns(),
+                    Select::make('model')
+                        ->label('Modelo')
+                        ->searchable()
+                        ->hidden(fn($get) => is_null($get('brand')))
+                        ->options(fn($get) => $this->getModelOptions($get('brand')))
+                        ->live()
+                        ->afterStateUpdated(fn($set) => $set('year', null)),
 
-                        Select::make('model')
-                            ->label('Modelo')
-                            ->searchable()
-                            ->hidden(fn($get) => is_null($get('brand')))
-                            ->options(function ($get) {
-                                $brand = $get('brand');
-                                if (!is_null($brand)) {
-                                    $models = FipeCarros::getModelos($brand)['modelos'];
-                                    $modelOptions = [];
-                                    foreach ($models as $model) {
-                                        $modelOptions[$model['codigo']] = $model['nome'];
-                                    }
+                    Select::make('year')
+                        ->label('Ano')
+                        ->searchable()
+                        ->live()
+                        ->hidden(fn($get) => is_null($get('model')))
+                        ->options(fn($get) => $this->getYearOptions($get('brand'), $get('model')))
+                ]),
 
-                                    return $modelOptions;
-                                }
+            Section::make('Adicione os dados referentes ao seu carro')
+                ->hidden(fn($get) => is_null($get('year')))
+                ->schema([
+                    TextInput::make('kilometers')
+                        ->label('Kilometragem')
+                        ->placeholder('Adicione a kilometragem do seu carro')
+                        ->numeric()
+                        ->minValue(0)
+                        ->required(),
 
-                                return [];
-
-                            })->live()
-                            ->afterStateUpdated(function ($set) {
-                                $set('year', null);
-                            })->columns(),
-
-                        Select::make('year')
-                            ->label('Ano')
-                            ->searchable()
-                            ->live()
-                            ->hidden(fn($get) => is_null($get('model')))
-                            ->options(function ($get) {
-                                $model = $get('model');
-                                $brand = $get('brand');
-                                if (!is_null($model)) {
-                                    $years = FipeCarros::getAnos($brand, $model);
-                                    $yearOptions = [];
-                                    foreach ($years as $year) {
-                                        $yearOptions[$year['codigo']] = $year['nome'];
-                                    }
-
-                                    return $yearOptions;
-                                }
-
-                                return [];
-                            })->columns(),
-                    ]),
-
-                Section::make('Adicione os dados referentes ao seu carro')
-                    ->hidden(fn($get) => is_null($get('year')))
-                    ->schema([
-                        TextInput::make('kilometers')
-                            ->label('Kilometragem')
-                            ->placeholder('Adicione a kilometragem do seu carro')
-                            ->numeric()
-                            ->minValue(0)
-                            ->required(),
-
-                        TextInput::make('plate')
-                            ->label('Placa')
-                            ->validationMessages(['regex' => 'A placa deve ser no formato Brasileiro Mercosul'])
-                            ->mask('aaa 9a99')
-                            ->required()
-                            ->placeholder('ABC 1D23')
-                            ->autocapitalize('characters') // Encourages uppercase input on mobile
-                            ->extraInputAttributes([
-                                'style' => 'text-transform: uppercase', // Displays text in uppercase
-                            ])
-                    ])
-            ]);
+                    TextInput::make('plate')
+                        ->label('Placa')
+                        ->validationMessages(['regex' => 'A placa deve ser no formato Brasileiro Mercosul'])
+                        ->mask('aaa 9a99')
+                        ->required()
+                        ->placeholder('ABC 1D23')
+                        ->autocapitalize('characters')
+                        ->extraInputAttributes([
+                            'style' => 'text-transform: uppercase',
+                        ])
+                ])
+        ]);
     }
 
     protected function getRedirectUrl(): string

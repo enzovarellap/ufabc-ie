@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\CarResource;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -34,12 +35,13 @@ class CarStats extends BaseWidget
         }
 
         return [
-            Stat::make('Meu Carro', $car->brand . ' - ' . $car->model)
-                ->icon('fas-car')
-                ->description('Ano: ' . $car->year . ' | Placa: ' . $car->plate),
 
             Stat::make('Kilometragem', number_format($carKilometers, 0, ',', '.') . ' kms')
-                ->icon('fas-road'),
+                ->icon('fas-road')
+                ->extraAttributes([
+                    'class' => 'cursor-pointer',
+                    'wire:click' => 'goToEdit',
+                ]),
 
             Stat::make('Serviços Pendentes', $pendingCount)
                 ->icon('heroicon-s-wrench-screwdriver')
@@ -51,4 +53,14 @@ class CarStats extends BaseWidget
                 ->icon('fas-money-bill-alt'),
         ];
     }
+
+
+    public function goToEdit()
+    {
+        $car = auth()->user()->car->first();
+        if ($car) {
+            return redirect(CarResource::getUrl('edit', ['record' => $car]));
+        }
+    }
+
 }

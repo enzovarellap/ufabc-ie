@@ -16,6 +16,7 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class CarExpensesResource extends Resource
@@ -84,7 +85,8 @@ class CarExpensesResource extends Resource
                     ->date('d/m/Y'),
             ])
             ->filters([
-                //
+                SelectFilter::make('category')
+                    ->options(ExpenseCategory::toArray())
             ])
             ->actions([
                 EditAction::make(),

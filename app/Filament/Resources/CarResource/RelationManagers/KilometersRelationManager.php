@@ -17,6 +17,9 @@ class KilometersRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\TextInput::make('kilometers')
+                    ->label('Kilometragem')
+                    ->numeric()
+                    ->minValue(0)
                     ->required()
                     ->maxLength(255),
             ]);
@@ -26,23 +29,26 @@ class KilometersRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('kilometers')
+            ->heading('Kilometragem')
             ->columns([
-                Tables\Columns\TextColumn::make('kilometers'),
+                Tables\Columns\TextColumn::make('kilometers')
+                    ->label('KMs')
+                    ->formatStateUsing(fn(int $state) => number_format($state, 0, ',', '.')),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->modalHeading('Adicionar Kilometragem')
+                    ->label('Adicionar')
+                    ->icon('heroicon-o-plus'),
             ])
+            ->paginated(false)
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

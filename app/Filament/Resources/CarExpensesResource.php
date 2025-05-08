@@ -3,7 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\ExpenseCategory;
+use App\Filament\Resources\CarExpansesResource\Widgets\CarExpansesTotalStatWidget;
 use App\Filament\Resources\CarExpensesResource\Pages;
+use App\Filament\Resources\CarExpensesResource\Widgets\CarExpansesPerCategoryWidget;
+use App\Filament\Resources\CarExpensesResource\Widgets\CarExpensesPerMonthWidget;
 use App\Models\CarExpenses;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
@@ -18,6 +21,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class CarExpensesResource extends Resource
 {
@@ -86,12 +90,25 @@ class CarExpensesResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('category')
-                    ->options(ExpenseCategory::toArray())
+                    ->options(ExpenseCategory::toArray()),
+
+                DateRangeFilter::make('expense_date')
+                ->label('Data da Despesa')
+                ->defaultThisMonth(),
             ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ]);
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            CarExpensesPerMonthWidget::class,
+            CarExpansesPerCategoryWidget::class,
+            CarExpansesTotalStatWidget::class
+        ];
     }
 
     public static function getPages(): array

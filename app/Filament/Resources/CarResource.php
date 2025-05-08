@@ -7,6 +7,7 @@ use App\Filament\Resources\CarResource\RelationManagers\KilometersRelationManage
 use App\Models\Car;
 use DeividFortuna\Fipe\FipeCarros;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -51,14 +52,14 @@ class CarResource extends Resource
 
                 Select::make('model')
                     ->searchable()
-                    ->hidden(fn ($get) => is_null($get('brand')))
+                    ->hidden(fn($get) => is_null($get('brand')))
                     ->options(function ($get) use (&$brandOptions) {
                         $brand = $get('brand');
-                        if (! ctype_digit($brand)) {
+                        if (!ctype_digit($brand)) {
                             $brand = array_search($get('brand'), $brandOptions);
                         }
 
-                        if (! is_null($brand)) {
+                        if (!is_null($brand)) {
                             $models = FipeCarros::getModelos($brand)['modelos'];
                             $modelOptions = [];
                             foreach ($models as $model) {
@@ -71,19 +72,19 @@ class CarResource extends Resource
                         return [];
 
                     })->live()
-                    ->afterStateUpdated(fn ($set) => $set('year', null)),
+                    ->afterStateUpdated(fn($set) => $set('year', null)),
 
                 Select::make('year')
                     ->searchable()
-                    ->hidden(fn ($get) => is_null($get('model')))
+                    ->hidden(fn($get) => is_null($get('model')))
                     ->options(function ($get) use (&$brandOptions) {
                         $brand = $get('brand');
                         $model = $get('model');
 
-                        if (! ctype_digit($brand)) {
+                        if (!ctype_digit($brand)) {
                             $brand = array_search($get('brand'), $brandOptions);
                         }
-                        if (! ctype_digit($model)) {
+                        if (!ctype_digit($model)) {
                             $models = FipeCarros::getModelos($brand)['modelos'];
                             $modelOptions = [];
                             foreach ($models as $model) {
@@ -93,7 +94,7 @@ class CarResource extends Resource
                             $model = array_search($get('model'), $modelOptions);
                         }
 
-                        if (! is_null($model)) {
+                        if (!is_null($model)) {
                             $years = FipeCarros::getAnos($brand, $model);
                             $yearOptions = [];
                             foreach ($years as $year) {
@@ -111,7 +112,7 @@ class CarResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(fn () => Car::query()->where('user_id', auth()->user()->id))
+            ->query(fn() => Car::query()->where('user_id', auth()->user()->id))
             ->columns([
                 TextColumn::make('brand')
                     ->label('Marca'),
@@ -124,26 +125,24 @@ class CarResource extends Resource
 
                 TextColumn::make('value')
                     ->label('Valor')
-                    ->formatStateUsing(fn (int $state) => Number::currency($state, 'BRL', 'pt_BR')),
+                    ->formatStateUsing(fn(int $state) => Number::currency($state, 'BRL', 'pt_BR')),
 
                 TextColumn::make('fipe_code')->label('Código Fipe'),
+
+                TextColumn::make('plate')
+                    ->label('Placa'),
 
                 TextColumn::make('kilometers_sum_kilometers')
                     ->label('KMs')
                     ->sum('kilometers', 'kilometers')
-                    ->formatStateUsing(fn (int $state) => number_format($state, '2', ',', '.').' kms'),
+                    ->formatStateUsing(fn(int $state) => number_format($state, '2', ',', '.') . ' kms'),
             ])
             ->filters([
                 //
             ])
+            ->paginated(false)
             ->actions([
-                EditAction::make(),
                 DeleteAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

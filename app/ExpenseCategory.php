@@ -60,6 +60,22 @@ enum ExpenseCategory: string
         };
     }
 
+    public function rgbaColor(): string
+    {
+        return match($this) {
+            self::FUEL => 'rgba(54, 162, 235, 0.6)',
+            self::MAINTENANCE => 'rgba(255, 206, 86, 0.6)',
+            self::REPAIR => 'rgba(255, 99, 132, 0.6)',
+            self::DOCUMENTATION => 'rgba(75, 192, 192, 0.6)',
+            self::INSURANCE => 'rgba(153, 102, 255, 0.6)',
+            self::PARKING_AND_TOLL => 'rgba(201, 203, 207, 0.6)',
+            self::CLEANING_AND_CARE => 'rgba(255, 0, 255, 0.6)',
+            self::ACCESSORIES_AND_CUSTOM => 'rgba(255, 159, 64, 0.6)',
+            self::FINES_AND_FEES => 'rgba(255, 69, 0, 0.6)',
+            self::OTHERS => 'rgba(128, 128, 128, 0.6)',
+        };
+    }
+
     /**
      * Retorna o ícone do Heroicons correspondente à categoria
      */
@@ -113,6 +129,17 @@ enum ExpenseCategory: string
         }
         return 'gray'; // Cor padrão para valores desconhecidos
     }
+
+    public static function getRgbaColorFromLabel(string $label): string
+    {
+        foreach (self::cases() as $case) {
+            if ($case->value === $label) {
+                return $case->rgbaColor();
+            }
+        }
+        return 'gray'; // Cor padrão para valores desconhecidos
+    }
+
 
     public static function getIconFromLabel(string $label): string
     {

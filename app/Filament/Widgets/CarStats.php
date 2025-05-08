@@ -7,6 +7,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class CarStats extends BaseWidget
 {
+    protected static ?int $sort = 1;
+
     protected function getStats(): array
     {
         $car = auth()->user()->car->first();

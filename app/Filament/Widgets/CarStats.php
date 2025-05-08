@@ -2,9 +2,12 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\CarExpensesResource;
 use App\Filament\Resources\CarResource;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Http\RedirectResponse;
+use Livewire\Features\SupportRedirects\Redirector;
 
 class CarStats extends BaseWidget
 {
@@ -56,12 +59,19 @@ class CarStats extends BaseWidget
 
             Stat::make('Gasto Previsto', \Number::currency($pendingCarServices->sum('price') + $carMonthExpenses, 'BRL', 'pt-BR'))
                 ->icon('fas-wallet')
-                ->description('Despesas + Serviços Pendentes'),
+                ->description('Despesas + Serviços Pendentes')->extraAttributes([
+                    'class' => 'cursor-pointer',
+                    'wire:click' => 'goToExpenses',
+                ]),
 
 
         ];
     }
 
+    public function goToExpenses(): RedirectResponse|Redirector
+    {
+        return redirect(CarExpensesResource::getUrl('index'));
+    }
 
     public function goToEdit()
     {

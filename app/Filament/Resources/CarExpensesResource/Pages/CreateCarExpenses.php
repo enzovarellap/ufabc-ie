@@ -25,4 +25,9 @@ class CreateCarExpenses extends CreateRecord
 
        return CarExpenses::create($data);
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

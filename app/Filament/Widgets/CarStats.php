@@ -20,6 +20,7 @@ class CarStats extends BaseWidget
         $carKilometers = $car->kilometers->sum('kilometers');
         $pendingCarServices = $car->services()->wherePivot('is_done', false);
         $pendingCount = $pendingCarServices->count();
+        $carMonthExpenses = $car->expenses()->whereBetween('expense_date', [now()->startOfMonth(), now()->endOfMonth()])->sum('value');
 
         if ($pendingCount === 0) {
             $pendingDescription = 'Tudo certo!';
@@ -53,8 +54,9 @@ class CarStats extends BaseWidget
                 ->descriptionIcon($pendingIcon)
                 ->descriptionColor($pendingColor),
 
-            Stat::make('Gasto Previsto', \Number::currency($pendingCarServices->sum('price'), 'BRL', 'pt-BR'))
-                ->icon('fas-wallet'),
+            Stat::make('Gasto Previsto', \Number::currency($pendingCarServices->sum('price') + $carMonthExpenses, 'BRL', 'pt-BR'))
+                ->icon('fas-wallet')
+                ->description('Despesas + Serviços Pendentes'),
 
 
         ];

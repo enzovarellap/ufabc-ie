@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\CarResource;
 use App\Models\Car;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,8 +18,24 @@ class CarServicesTableWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
+        $car = auth()->user()->car()->first();
+
+        if (!$car) {
+            return $table
+                ->query(Car::query()->where('user_id', auth()->user()->id))
+                ->emptyStateHeading('Nenhum carro cadastrado')
+                ->emptyStateDescription('Cadastre um carro para visualizar os serviços.')
+                ->emptyStateActions([
+                    Tables\Actions\Action::make('criar')
+                        ->label('Criar Carro')
+                        ->color('info')
+                        ->icon('heroicon-s-plus')
+                        ->url(CarResource::getUrl('create'))
+                ])
+                ->heading('Serviços Necessários');
+        }
         return $table
-            ->relationship(fn(): BelongsToMany => auth()->user()->car()->first()->services())
+            ->relationship(fn(): BelongsToMany => $car->services())
             ->heading('Serviços Necessários')
             ->bulkActions([
                 Tables\Actions\BulkAction::make('concluir')
@@ -36,7 +53,7 @@ class CarServicesTableWidget extends BaseWidget
                     })->deselectRecordsAfterCompletion()
             ])
             ->checkIfRecordIsSelectableUsing(
-                fn(Model $record): bool => ! $record->is_done,
+                fn(Model $record): bool => !$record->is_done,
             )
             ->actions([
                 Tables\Actions\Action::make('concluir')

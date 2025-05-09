@@ -21,6 +21,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class CarExpensesResource extends Resource
@@ -118,6 +119,11 @@ class CarExpensesResource extends Resource
             'create' => Pages\CreateCarExpenses::route('/create'),
             'edit' => Pages\EditCarExpenses::route('/{record}/edit'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->car()->exists();
     }
 
     public static function getGloballySearchableAttributes(): array
